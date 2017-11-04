@@ -1,0 +1,11 @@
+.npmignore
+/scripts
+/src
+/test
+/dev
+/out/test
+/out/src/*.map
+/images
+tsconfig.json
+.travis.yml
+.project
