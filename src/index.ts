@@ -44,8 +44,9 @@ function init(_modules: { typescript: typeof ts_module }) {
           for (let key of Object.keys(sources)) {
             if (!newCompilerOptions.paths[key]) newCompilerOptions.paths[key] = []
             for (let srcPath of sources[key]) {
-              if (newCompilerOptions.paths[key].indexOf(srcPath) < 0) {
-                newCompilerOptions.paths[key].unshift(srcPath)
+              let resolvedPath = path.resolve(rootPath, srcPath)
+              if (newCompilerOptions.paths[key].indexOf(resolvedPath) < 0) {
+                newCompilerOptions.paths[key].unshift(resolvedPath)
                 optionsDirty = true;
               }
             }

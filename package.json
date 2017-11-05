@@ -12,7 +12,6 @@
   "scripts": {
     "prepublish": "tsc",
     "compile": "tsc",
-    "publish": "node ./scripts/git-tag.js",
     "test": "tsc && tape out/test/**/*.spec.js",
     "lint": "tslint src/index.ts"
   },
