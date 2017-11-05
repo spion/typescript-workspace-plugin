@@ -1,13 +1,18 @@
-# typescript-workspaces-plugin
+# typescript-workspace-plugin
 
 Simple plugin that adds support for yarn-like workspaces to typescript
 
 ### configuring
 
-In the same `package.json` that specifies the yarn workspaces, add a new key
-that specifies the paths of the workspace sources
+Add the plugin to all your `tsconfig.json` files of the individual packages:
 
-Example:
+```json
+{
+  "plugins": [{"name": "typescript-workspace-plugin"}]
+}
+```
+
+Then at the toplevel package.json alongside yarn's "workspaces" entry, add a "workspace-sources" entry:
 
 ```json
 {
@@ -18,3 +23,6 @@ Example:
 }
 ```
 
+The field works exatly like the "paths" field in tsconfig.json but it only affects the language
+service of the individual projects, pointing them to the package sources. Restores proper
+"go to definition / type" functionality and similar.
