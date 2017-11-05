@@ -64,41 +64,7 @@ function init(_modules: { typescript: typeof ts_module }) {
       rootPath = newRoot;
     } while (true);
 
-    // Set up decorator
-    const proxy = Object.create(null) as ts.LanguageService;
-    const oldLS = info.languageService;
-    for (const k in oldLS) {
-      (proxy as any)[k] = function() {
-        return (oldLS as any)[k].apply(oldLS, arguments);
-      };
-    }
-
-    proxy.getDefinitionAtPosition = (file: string, position: number) => {
-      let defs = oldLS.getDefinitionAtPosition(file, position);
-
-      for (let def of defs) {
-        for (let pkName of [] as string[])
-          if (def.fileName.indexOf(pkName) === 0) {
-            try {
-              let options = info.project.getCompilerOptions();
-              if (options.paths == null) {
-                options.paths = {};
-              }
-              options.baseUrl = './';
-              options.paths[pkName.split('/').slice(-1)[0]] = [pkName + '/src'];
-              info.project.setCompilerOptions(options);
-              return oldLS.getDefinitionAtPosition(file, position);
-            } catch (e) {
-              log(pkName + ' Found error: ' + e.message);
-              log(pkName + ' ' + e.stack.split('\n').join(';;;'));
-            }
-          }
-      }
-
-      return defs;
-    };
-
-    return proxy;
+    return info.languageService;
   }
 
   return { create };
