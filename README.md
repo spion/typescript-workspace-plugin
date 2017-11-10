@@ -28,7 +28,12 @@ The field works exatly like the "paths" field in tsconfig.json but it only affec
 service of the individual projects, pointing them to the package sources. Restores proper
 "go to definition / type" functionality and similar.
 
+#### Benefits
+
 The packages still have their individual tsconfig.json
 
 They can have separate repos and be cloned and developed completely independent of the master
 workspace like e.g. prosemirror: https://github.com/ProseMirror/prosemirror
+
+When cloned independently, "go to definition" and "find references" functionality will 
+behave as if the dependencies are standard node modules (definition files available only)
