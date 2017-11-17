@@ -18,9 +18,9 @@ function init(_modules: { typescript: typeof ts_module }) {
       info.project.projectService.logger.info('typescript-workspace-plugin ' + content);
     };
 
-    log('loaded for ' + info.project.getProjectRootPath());
+    log('loaded for ' + info.project.getProjectName());
 
-    let rootPath = info.project.getProjectRootPath();
+    let rootPath = path.dirname(info.project.getProjectName());
 
     let rootPkgJson = null;
     do {
