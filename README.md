@@ -28,6 +28,18 @@ The field works exatly like the "paths" field in tsconfig.json but it only affec
 service of the individual projects, pointing them to the package sources. Restores proper
 "go to definition / type" functionality and similar.
 
+#### Workspace TypeScript must be used.
+
+Once you install and configure the plugin, make sure to switch to the **workspace** version of typescript installed with your project! Otherwise, the plugin will not be loaded.
+
+From cmd+shift+p (ctrl+shift+p), type in:
+
+* typescript version
+* use workspace
+
+If it still doesn't work after that, a cmd+shift+p -> Reload afterwards might help.
+
+
 #### Benefits
 
 The packages still have their individual tsconfig.json
