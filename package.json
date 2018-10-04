@@ -1,6 +1,6 @@
 {
   "name": "typescript-workspace-plugin",
-  "version": "1.0.5",
+  "version": "2.0.0",
   "description": "typescript workspace - language services plugin",
   "main": "out/src/index.js",
   "author": "spion",
