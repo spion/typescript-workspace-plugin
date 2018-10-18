@@ -34,7 +34,12 @@ function init(_modules: { typescript: typeof ts_module }) {
         let sources = rootPkgJson['workspace-sources'];
         if (sources) {
           log('Found workspace: ' + JSON.stringify(sources));
-          let pathOptions = ({ paths: {} } as any) as ts_module.CompilerOptions;
+          let pathOptions = ({
+             baseUrl: rootPath,
+             paths: {},
+             rootDir: undefined
+            } as any) as ts_module.CompilerOptions;
+
           for (let key of Object.keys(sources)) {
             if (!pathOptions.paths[key]) pathOptions.paths[key] = [];
             for (let srcPath of sources[key]) {
@@ -51,7 +56,7 @@ function init(_modules: { typescript: typeof ts_module }) {
             let oldOptions = oldCOptions.call(this);
             if (!patchedOptions) {
               log('Got old options:' + JSON.stringify(oldOptions));
-              oldOptions = Object.assign({ baseUrl: '.' }, oldOptions, pathOptions);
+              oldOptions = Object.assign(oldOptions, pathOptions);
               info.project.setCompilerOptions(oldOptions);
               log('Got new options:' + JSON.stringify(oldOptions));
               patchedOptions = true;
@@ -62,26 +67,29 @@ function init(_modules: { typescript: typeof ts_module }) {
           let replacer = (s: string) => s;
           let remainingGood = (_s: string) => true;
           Object.keys(sources).forEach(p => {
+            let pathVal = sources[p];
             let replacement = '"' + p.replace('*', '$1') + '"';
-            let searchment = new RegExp('[\'"]' + sources[p][0].replace('*', '(.+)') + '[\'"]');
-            let badResult = new RegExp(sources[p][0].replace('*', '.+'));
+            let searchment = new RegExp('[\'"]' + pathVal[0].replace('*', '(.+)') + '[\'"]');
+            let modulePattern = new RegExp(pathVal[0].replace('*', '(.+)') + '/');
             let oldReplacer = replacer;
             let oldTester = remainingGood;
-            replacer = s => {
-              let res = oldReplacer(s);
-              return res.replace(searchment, replacement);
+            replacer = (fileImport) => {
+              let res = oldReplacer(fileImport);
+              let next = res.replace(searchment, replacement);
+              //log(`${res} -> ${next} ;; via ${searchment} -> ${replacement}`);
+              return next;
             };
             remainingGood = s => {
-              let old = oldTester(s) && !badResult.test(s);
+              let old = oldTester(s) && !modulePattern.test(s);
               return old;
             };
           });
 
           let cfap = info.languageService.getCodeFixesAtPosition;
 
-          info.languageService.getCodeFixesAtPosition = function(): ReadonlyArray<
-            ts.CodeFixAction
-          > {
+          info.languageService.getCodeFixesAtPosition = function(
+            _fileName: string
+          ): ReadonlyArray<ts.CodeFixAction> {
             let results = cfap.apply(this, arguments) as ReadonlyArray<ts.CodeFixAction>;
             results.forEach(res => {
               if (!res.description.match(/import.+from module/i)) return res;
