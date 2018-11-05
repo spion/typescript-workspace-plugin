@@ -24,6 +24,7 @@ function init(_modules: { typescript: typeof ts_module }) {
     log('loaded for ' + info.project.getProjectName());
 
     let rootPath = path.dirname(info.project.getProjectName());
+    let initialRootPath = rootPath;
 
     let rootPkgJson = null;
     do {
@@ -35,10 +36,10 @@ function init(_modules: { typescript: typeof ts_module }) {
         if (sources) {
           log('Found workspace: ' + JSON.stringify(sources));
           let pathOptions = ({
-             baseUrl: rootPath,
-             paths: {},
-             rootDir: undefined
-            } as any) as ts_module.CompilerOptions;
+            baseUrl: rootPath,
+            paths: {},
+            rootDir: undefined
+          } as any) as ts_module.CompilerOptions;
 
           for (let key of Object.keys(sources)) {
             if (!pathOptions.paths[key]) pathOptions.paths[key] = [];
@@ -55,8 +56,18 @@ function init(_modules: { typescript: typeof ts_module }) {
           info.project.getCompilerOptions = function() {
             let oldOptions = oldCOptions.call(this);
             if (!patchedOptions) {
+              let oldPaths: ts_module.MapLike<string[]> =
+              Object.keys(oldOptions.paths || {}).reduce((prev, curr) => {
+                let keys = oldOptions.paths[curr].map((p: string) =>
+                  path.resolve(initialRootPath, oldOptions.baseUrl, p)
+                );
+                return Object.assign({}, prev, { [curr]: keys });
+              }, {}) || {};
+              let newPaths = pathOptions.paths;
               log('Got old options:' + JSON.stringify(oldOptions));
-              oldOptions = Object.assign(oldOptions, pathOptions);
+              oldOptions = Object.assign(oldOptions, pathOptions, {
+                paths: Object.assign({}, oldPaths, newPaths)
+              });
               info.project.setCompilerOptions(oldOptions);
               log('Got new options:' + JSON.stringify(oldOptions));
               patchedOptions = true;
