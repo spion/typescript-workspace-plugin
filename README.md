@@ -1,3 +1,7 @@
+# DEPRECATED
+
+Other solutions have emerged since. Please see typescript's project mode.
+
 # typescript-workspace-plugin
 
 Simple plugin that adds support for yarn-like workspaces to typescript
